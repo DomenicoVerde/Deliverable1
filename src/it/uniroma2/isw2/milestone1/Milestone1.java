@@ -75,6 +75,11 @@ public class Milestone1 {
 		return jiraResults;
 	}
 	
+	public static void writeIssueDate(FileWriter f, String IssueID, Date date) throws IOException {
+		f.append(IssueID + ";" + (date.getMonth() + 1) + "/" + (date.getYear() + 1900) + "\n");
+	}
+	
+	
 	public static void main(String[] args) 
 			throws IOException, JSONException, NoHeadException, GitAPIException {
 		
@@ -87,7 +92,7 @@ public class Milestone1 {
 		//Part 2: Get the fix date of every bug from Git and store it in a .CSV file
 		logger.info("Downloading repository from Git...");
 		Git git = Git.cloneRepository().setURI("https://gitbox.apache.org/repos/asf/vcl.git")
-		  .setDirectory(new File("C:/Users/domen/eclipse-workspace/Milestone1/data/vcl.git"))
+		  .setDirectory(new File("data/vcl.git"))
 		  .setCloneAllBranches(true)
 		  .call();
 			
@@ -110,13 +115,10 @@ public class Milestone1 {
 		logger.info("Done! Found " + results + " commits in Git!");
 		
 		//Formatting data for CSV
-		FileWriter csvWriter = new FileWriter("C:/Users/domen/eclipse-workspace/Milestone1/data/vcl.csv");
-		
+		FileWriter csvWriter = new FileWriter("data/vcl.csv");
 		csvWriter.append("Ticket ID;" + "Fix Date\n");
-		csvWriter.append("VCL-first;" 
-				+ (firstDate.getMonth() + 1) + "/" + (firstDate.getYear() + 1900) + "\n");
-		csvWriter.append("VCL-last;" 
-				+ (lastDate.getMonth() + 1) + "/" + (lastDate.getYear() + 1900) + "\n");
+		writeIssueDate(csvWriter, "VCL-first", firstDate);
+		writeIssueDate(csvWriter, "VCL-last", lastDate);
 			
 		//for each fixed bug, take the ticket id 
 		for (int z=0; z < fixedBugs.length(); z++) {
@@ -136,8 +138,7 @@ public class Milestone1 {
 			//write results in CSV
 			Date defaultDate = new Date(0);
 			if (fixDate.compareTo(defaultDate) != 0) {
-				csvWriter.append(key + ";" + (fixDate.getMonth() + 1) + 
-						"/" + (fixDate.getYear() + 1900) + "\n");
+				writeIssueDate(csvWriter, key, fixDate);
 			}
 		}
 			
