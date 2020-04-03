@@ -13,10 +13,14 @@ import java.util.Date;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 public class Milestone1 {
+	
+	private static final Logger logger = LogManager.getLogger(Milestone1.class);
 	
 	private static String readAll(Reader rd) throws IOException {
 		StringBuilder sb = new StringBuilder();
@@ -67,7 +71,7 @@ public class Milestone1 {
 			}  
 		} while (i < total);
 		
-		System.out.println("Found " + fixedBugs.length() + " fixed bugs in Jira DB!");
+		logger.info("Found " + fixedBugs.length() + " fixed bugs in Jira DB!");
 		
 		// Part 2: Get the fix date of every bug from Git and store it in a CSV file
 		try (FileWriter csvWriter = new FileWriter("C:/Users/domen/eclipse-workspace/"
@@ -102,7 +106,7 @@ public class Milestone1 {
 				results++;
 			}
 			
-			System.out.println("Found " + results + " commits in Git!");
+			logger.info("Found " + results + " commits in Git!");
 			
 			csvWriter.append("VCL-first;" + (firstDate.getMonth() + 1) + 
 					"/" + (firstDate.getYear() + 1900) + "\n");
@@ -131,12 +135,13 @@ public class Milestone1 {
 							"/" + (fixDate.getYear() + 1900) + "\n");
 				}
 			}
+			
 			csvWriter.flush();
-			csvWriter.close();
+			
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.fatal(e);
 		} 
-		System.out.println("Il tuo file CSV è pronto!");
+		logger.info("Il tuo file CSV è pronto!");
 	}
 }
 		
