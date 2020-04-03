@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import org.json.JSONException;
@@ -30,10 +29,9 @@ public class Milestone1 {
 
 	public static JSONArray readJsonArrayFromUrl(String url) throws IOException, JSONException {
 		try (InputStream is = new URL(url).openStream()) {
-			BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+			BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
 			String jsonText = readAll(rd);
-			JSONArray json = new JSONArray(jsonText);
-			return json;
+			return new JSONArray(jsonText);
 		}
 	}
 
@@ -72,7 +70,8 @@ public class Milestone1 {
 		System.out.println("Found " + fixedBugs.length() + " fixed bugs in Jira DB!");
 		
 		// Part 2: Get the fix date of every bug from Git and store it in a CSV file
-		try  {
+		try (FileWriter csvWriter = new FileWriter("C:/Users/domen/eclipse-workspace/"
+					+ "Milestone1/data/vcl.csv")) {
 			//to clone the repository in the data folder (use only first time)
 			/*Git git = Git.cloneRepository()
 					  .setURI("https://gitbox.apache.org/repos/asf/vcl.git")
@@ -85,8 +84,6 @@ public class Milestone1 {
 					+ "Milestone1/data/vcl.git")).call();
 			
 			//formatting data to export a CSV
-			FileWriter csvWriter = new FileWriter("C:/Users/domen/eclipse-workspace/"
-					+ "Milestone1/data/vcl.csv");
 			csvWriter.append("Ticket ID;" + "Fix Date\n");
 			
 			//iterate over commits to get first and last commit date
@@ -140,7 +137,6 @@ public class Milestone1 {
 			e.printStackTrace();
 		} 
 		System.out.println("Il tuo file CSV è pronto!");
-		return;
 	}
 }
 		
