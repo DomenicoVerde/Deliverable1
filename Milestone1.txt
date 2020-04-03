@@ -1,0 +1,12 @@
+Dettagli 1 progetto ISW2:
+- I dati su cui va fatto il plot devono essere automaticamente generati. 
+Il grafico può essere fatto in un qualsiasi ambiente statistico come Excel
+
+- L'output del codice java consiste in un file CSV avente 
+come colonne Mese / Numero (dell'entità che state misurando)
+
+Project Name: VCL-256
+Asse X = Mesi = {Gen, ..., Dec}
+Asse Y = 22 mod 3 = 1 = Numero di Bugs risolti
+
+Linkage: percentuale di ticket che hanno il relativo commit < 100%
