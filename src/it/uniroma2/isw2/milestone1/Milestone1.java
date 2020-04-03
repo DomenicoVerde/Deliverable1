@@ -135,26 +135,27 @@ public class Milestone1 {
 		logger.info("Done! Found " + results + " commits in Git!");
 		
 		//Formatting data for CSV
-		FileWriter csvWriter = new FileWriter("data/vcl.csv");
-		csvWriter.append("Ticket ID;" + "Fix Date\n");
-		writeIssueDate(csvWriter, "VCL-first", firstDate);
-		writeIssueDate(csvWriter, "VCL-last", lastDate);
-			
-		//for each fixed bug, take the ticket id 
-		for (int z=0; z < fixedBugs.length(); z++) {
-			String key = fixedBugs.getJSONObject(z).get("key").toString();			
-			//do git log --grep=ticketID -> search for all commits containing that ticket id
-			Date fixDate = getFixDate(key, git);
-			//write results in CSV
-			Date defaultDate = new Date(0);
-			if (fixDate.compareTo(defaultDate) != 0) {
-				writeIssueDate(csvWriter, key, fixDate);
+		try (FileWriter csvWriter = new FileWriter("data/vcl.csv")) {
+			csvWriter.append("Ticket ID;" + "Fix Date\n");
+			writeIssueDate(csvWriter, "VCL-first", firstDate);
+			writeIssueDate(csvWriter, "VCL-last", lastDate);
+				
+			//for each fixed bug, take the ticket id 
+			for (int z=0; z < fixedBugs.length(); z++) {
+				String key = fixedBugs.getJSONObject(z).get("key").toString();			
+				//do git log --grep=ticketID -> search for all commits containing that ticket id
+				Date fixDate = getFixDate(key, git);
+				//write results in CSV
+				Date defaultDate = new Date(0);
+				if (fixDate.compareTo(defaultDate) != 0) {
+					writeIssueDate(csvWriter, key, fixDate);
+				}
 			}
-		}
 			
-		csvWriter.flush();
-		csvWriter.close();
-		logger.info("Il tuo file CSV è pronto!");
+			csvWriter.flush();
+		} finally {
+			logger.info("Il tuo file CSV è pronto!");
+		}
 	}
 }
 		
