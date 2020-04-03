@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Calendar;
 import java.util.Date;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,7 +50,7 @@ public class Milestone1 {
 		}
 	}
 
-	public static JSONArray retrieveFromJira(String projName, String issueType, String resolution) 
+	public static JSONArray retrieveJSONFromJira(String projName, String issueType, String resolution) 
 			throws IOException, JSONException {
 		Integer j = 0;
 		Integer i = 0;
@@ -75,17 +76,36 @@ public class Milestone1 {
 		return jiraResults;
 	}
 	
-	public static void writeIssueDate(FileWriter f, String IssueID, Date date) throws IOException {
-		f.append(IssueID + ";" + (date.getMonth() + 1) + "/" + (date.getYear() + 1900) + "\n");
+	public static void writeIssueDate(FileWriter f, String issueid, Date date) throws IOException {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		int month = cal.get(Calendar.MONTH) + 1;
+		int year = cal.get(Calendar.YEAR);
+		f.append(issueid + ";" + month + "/" + year + "\n");
 	}
 	
+	public static Date getFixDate(String key, Git git)
+			throws NoHeadException, GitAPIException, IOException {
+		Iterable <RevCommit>commits = git.log().all().call();  
+		Date fixDate = new Date(0);
+		for (RevCommit commit : commits) {
+			if (commit.getFullMessage().contains(key)) {
+				//the fix date is the last date containing that id in the commit message
+				Date commitDate = commit.getCommitterIdent().getWhen();
+				if (fixDate.compareTo(commitDate) < 0) {
+					fixDate = commitDate;
+				}	
+			}
+		}
+		return fixDate;
+	}
 	
 	public static void main(String[] args) 
 			throws IOException, JSONException, NoHeadException, GitAPIException {
 		
 		//Part 1: Retrieving from Jira all the JSON fixed bugs of the VCL project
 		logger.info("Retieving data from Jira...");
-		JSONArray fixedBugs = retrieveFromJira("VCL", "Bug", "fixed");
+		JSONArray fixedBugs = retrieveJSONFromJira("VCL", "Bug", "fixed");
 		logger.info("Found " + fixedBugs.length() + " fixed bugs in Jira DB!");
 		
 		
@@ -124,17 +144,7 @@ public class Milestone1 {
 		for (int z=0; z < fixedBugs.length(); z++) {
 			String key = fixedBugs.getJSONObject(z).get("key").toString();			
 			//do git log --grep=ticketID -> search for all commits containing that ticket id
-			commits = git.log().all().call();  
-			Date fixDate = new Date(0);
-			for (RevCommit commit : commits) {
-				if (commit.getFullMessage().contains(key)) {
-					//the fix date is the last date containing that id in the commit message
-					Date commitDate = commit.getCommitterIdent().getWhen();
-					if (fixDate.compareTo(commitDate) < 0) {
-						fixDate = commitDate;
-					}	
-				}
-			}
+			Date fixDate = getFixDate(key, git);
 			//write results in CSV
 			Date defaultDate = new Date(0);
 			if (fixDate.compareTo(defaultDate) != 0) {
