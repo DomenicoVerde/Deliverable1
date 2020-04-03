@@ -77,11 +77,7 @@ public class Milestone1 {
 		try (FileWriter csvWriter = new FileWriter("C:/Users/domen/eclipse-workspace/"
 					+ "Milestone1/data/vcl.csv")) {
 			//to clone the repository in the data folder (use only first time)
-			/*Git git = Git.cloneRepository()
-					  .setURI("https://gitbox.apache.org/repos/asf/vcl.git")
-					  .setDirectory(new File("C:/Users/domen/eclipse-workspace/Milestone1/data/vcl.git"))
-					  .setCloneAllBranches(true)
-					  .call();*/
+			/*Git git = Git.cloneRepository().setURI("https://gitbox.apache.org/repos/asf/vcl.git").setDirectory(new File("C:/Users/domen/eclipse-workspace/Milestone1/data/vcl.git")).setCloneAllBranches(true).call();*/
 
 			//if the repository is already cloned
 			Git git = Git.init().setDirectory(new File("C:/Users/domen/eclipse-workspace/"
