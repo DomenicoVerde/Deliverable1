@@ -76,7 +76,7 @@ public class Milestone1 {
 		return jiraResults;
 	}
 	
-	public static void writeIssueDate(FileWriter f, String issueid, Date date) throws IOException {
+	public static void writeFormatted(FileWriter f, String issueid, Date date) throws IOException {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
 		int month = cal.get(Calendar.MONTH) + 1;
@@ -86,6 +86,7 @@ public class Milestone1 {
 	
 	public static Date getFixDate(String key, Git git)
 			throws NoHeadException, GitAPIException, IOException {
+		//do git log --grep=ticketID -> search for all commits containing that ticket id
 		Iterable <RevCommit>commits = git.log().all().call();  
 		Date fixDate = new Date(0);
 		for (RevCommit commit : commits) {
@@ -103,20 +104,17 @@ public class Milestone1 {
 	public static void main(String[] args) 
 			throws IOException, JSONException, NoHeadException, GitAPIException {
 		
-		//Part 1: Retrieving from Jira all the JSON fixed bugs of the VCL project
 		logger.info("Retieving data from Jira...");
 		JSONArray fixedBugs = retrieveJSONFromJira("VCL", "Bug", "fixed");
 		logger.info("Found " + fixedBugs.length() + " fixed bugs in Jira DB!");
 		
-		
-		//Part 2: Get the fix date of every bug from Git and store it in a .CSV file
 		logger.info("Downloading repository from Git...");
 		Git git = Git.cloneRepository().setURI("https://gitbox.apache.org/repos/asf/vcl.git")
 		  .setDirectory(new File("data/vcl.git"))
 		  .setCloneAllBranches(true)
 		  .call();
-			
-		//iterate over commits to get first and last commit date and count them
+		
+		//Detect date of first and last commit
 		Iterable<RevCommit> commits = git.log().all().call();
 		Date firstDate = new Date();
 		Date lastDate = new Date(0);
@@ -130,31 +128,28 @@ public class Milestone1 {
 				lastDate = commitDate;
 			}
 			results++;
-		}
-			
+		}	
 		logger.info("Done! Found " + results + " commits in Git!");
 		
-		//Formatting data for CSV
-		try (FileWriter csvWriter = new FileWriter("data/vcl.csv")) {
+		//Formatting data to export a CSV file
+		try ( FileWriter csvWriter = new FileWriter("data/vcl.csv") ) {
 			csvWriter.append("Ticket ID;" + "Fix Date\n");
-			writeIssueDate(csvWriter, "VCL-first", firstDate);
-			writeIssueDate(csvWriter, "VCL-last", lastDate);
+			writeFormatted(csvWriter, "VCL-first", firstDate);
+			writeFormatted(csvWriter, "VCL-last", lastDate);
 				
-			//for each fixed bug, take the ticket id 
+			//for each fixed bug, get the ID and the fix date
 			for (int z=0; z < fixedBugs.length(); z++) {
-				String key = fixedBugs.getJSONObject(z).get("key").toString();			
-				//do git log --grep=ticketID -> search for all commits containing that ticket id
-				Date fixDate = getFixDate(key, git);
-				//write results in CSV
+				String bugID = fixedBugs.getJSONObject(z).get("key").toString();			
+				Date fixDate = getFixDate(bugID, git);
+				//write that date in CSV, only if there is a commit with that ID in Git
 				Date defaultDate = new Date(0);
 				if (fixDate.compareTo(defaultDate) != 0) {
-					writeIssueDate(csvWriter, key, fixDate);
+					writeFormatted(csvWriter, bugID, fixDate);
 				}
-			}
-			
+			}		
 			csvWriter.flush();
 		} finally {
-			logger.info("Il tuo file CSV è pronto!");
+			logger.info("Done! Your file .csv is ready!");
 		}
 	}
 }
