@@ -3,7 +3,7 @@
   <groupId>Milestone1</groupId>
   <artifactId>Milestone1</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>Milestone1</name>
+  <name>Deliverable1</name>
   <description>Software Analytics with Jira and Git</description>
   <build>
     <sourceDirectory>src</sourceDirectory>
