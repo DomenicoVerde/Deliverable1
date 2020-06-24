@@ -1,4 +1,4 @@
-# Primo progetto del corso di Ingegneria del Software 2
-Il presente codice è stato utilizzato per misurare il numero di fixed bugs del progetto Apache VCL, al fine di poter realizzare un process control chart.
+# Deliverable 1 - ISW2
+Il codice presente nella repository consente di realizzare di esportare un file .csv avente come colonne gli ID dei fixed bugs e le relative fix date. Tale file è stato poi utilizzato per generare un Process Control Chart del progetto Apache VCL.
 
-Domenico Verde - Corso di Laurea Magistrale in Ingegneria Informatica - Corso Ingegneria del Software II - Prof. Falessi D
+Domenico Verde - Ingegneria del Software 2 (9 CFU) - A.A. 2019-2020 - Prof. Falessi D.
